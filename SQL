@@ -1,0 +1,35 @@
+SELECT
+student_track_id, 
+student_id, 
+track_name, 
+date_enrolled, 
+track_completed, 
+days_for_completion,
+
+CASE
+
+WHEN days_for_completion IS NULL THEN 'NULL'
+WHEN days_for_completion = 0 THEN 'Same Day'
+WHEN days_for_completion between 1 and 7 then '1-7 days'
+WHEN days_for_completion between 8 and 30  then '8-30 days'
+WHEN days_for_completion between 31 and 60 then '31-60 days'
+WHEN days_for_completion between 61 and 90 then '61-90 days'
+WHEN days_for_completion between 91 and 365 then '91-365 days'
+ELSE '366 days and more'
+
+END AS completion_bucket
+
+FROM
+(
+	SELECT
+	ROW_NUMBER() OVER (ORDER BY student_id, track_name) AS student_track_id,
+  e.student_id,
+	i.track_name,
+	e.date_enrolled,
+    IF(e.date_completed IS NULL, 0, 1) AS track_completed,
+	DATEDIFF(e.date_completed, e.date_enrolled) AS days_for_completion
+	FROM
+	career_track_student_enrollments e
+JOIN
+	career_track_info i ON e.track_id = i.track_id
+) a;
