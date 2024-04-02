@@ -6,7 +6,7 @@ date_enrolled,
 track_completed, 
 days_for_completion,
 
-CASE
+CASE 
 
 WHEN days_for_completion IS NULL THEN 'NULL'
 WHEN days_for_completion = 0 THEN 'Same Day'
